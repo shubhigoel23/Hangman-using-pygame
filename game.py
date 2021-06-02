@@ -5,12 +5,13 @@ from words import choose_word
 from pygame.locals import *
 import pygame
 pygame.init()
-
+# initializes the display module
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode([1300, 700], pygame.RESIZABLE)
+# display screen's width and heigth are set and it is resizable
 pygame.display.set_caption('Hangman')
-
+# sets the caption of the display screen
 
 # define the RGB values for different colors
 blue = (0, 0, 128)
@@ -25,7 +26,7 @@ red = (255, 0, 0)
 maroon = (102, 0, 51)
 orange_red = (255, 69, 0)
 lightred = (255, 165, 145)
-darklightred = (255, 97, 81)
+darklightred = (255, 95, 81)
 
 
 subFont = pygame.font.SysFont('freesansbold', 36)
@@ -46,8 +47,7 @@ pygame.display.set_icon(img)
 image = pygame.image.load('hangman2.ico')
 image1 = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
-# setting the pygame font style(1st parameter)
-# and size of font(2nd parameter)
+# setting the pygame font style(1st parameter), size of font(2nd parameter)and for bold pass true else false
 mainFont = pygame.font.SysFont('timesnewroman', 40, True)
 mainFont1 = pygame.font.SysFont('Bahnschrift', 40, True)
 mainFont2 = pygame.font.SysFont('Segoe Script', 37, True)
@@ -82,6 +82,7 @@ about2 = nrmlBodyFont.render(
     "After a certain number of incorrect guesses, the game ends and the player loses.", True, saddle_brown, white)
 # if we want the text to be strong then  pass true else false as an parameter
 subFont2 = pygame.font.SysFont('chalkduster.ttf', 35, False)
+# set_underline function underlines the text if 1 is pass and its intensity increses with increase in number and if 0 no underline
 subFont2.set_underline(1)
 instructions = subFont2.render(
     "INSTRUCTIONS:", True, black, white)
@@ -92,10 +93,11 @@ instruction2 = nrmlBodyFont.render(
 instruction3 = nrmlBodyFont.render(
     "3. Only single hint will be provided to you. ", True, saddle_brown, white)
 
-# blanks for the letters of the word
+# intiall state of the word
 secret_word = choose_word()
 s_lenth = len(secret_word)
 word_g = ""
+# adding spaces after each letter
 for i in range(0, s_lenth):
     word_g = word_g+"_   "
 guessed_word = mainFont.render(
@@ -107,11 +109,10 @@ guessed_wordCen.center = (650, 520)
 letters_guessed = []
 chances = 8
 
-# hint function
-
 
 def hint(secret_word, letters_guessed):
-
+    # hint function
+    # if a letter of secret word not present in letters guessed then adds that letter to letters_guessed
     for ch in secret_word:
         if ch not in letters_guessed:
             letters_guessed.append(ch)
@@ -120,18 +121,24 @@ def hint(secret_word, letters_guessed):
     printFunction(g_word)
 
 
-'''buttons structure'''
-
-
 def button(word, x, y, w, h, ic, ac, action=None):
+    '''buttons structure'''
+    # ic stands for inactive color (original state of button) and ac means active color (when mouse is hovered over the button)
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
     if x+w > mouse[0] > x and y+h > mouse[1] > y:
+        # if the position of the mouse is within the button then change color
         pygame.draw.rect(screen, ac, (x, y, w, h))
         if click[0] == 1 and action != None:
+            # if there is a left click  and action provided is not null
+            # basically initially click returns (0,0,0) means no clicks
+            # (1,0,0) means left click
+            # (0,1,0) means center click
+            # (0,0,1) means right click
             action()
     else:
+        # without mouse position  over the button
         pygame.draw.rect(screen, ic, (x, y, w, h))
 
     buttonText = pygame.font.Font("freesansbold.ttf", 20)
@@ -139,37 +146,39 @@ def button(word, x, y, w, h, ic, ac, action=None):
     buttonTextRect = buttonTextSurf.get_rect()
     buttonTextRect.center = ((x+(w/2)), (y+(h/2)))
     screen.blit(buttonTextSurf, buttonTextRect)
+    clock.tick(30)
+    # changes 30 frames per second
 
 
 def printFunction(g_word):
     # Using join() + list comprehension
     # Insert character after every character pair
-    res = '    '.join(g_word[i:i + 1]
-                      for i in range(0, len(g_word), 1))
-    guessed_word = mainFont1.render(
-        res, True, maroon, white)
-    guessed_wordCen = guessed_word.get_rect()
-    guessed_wordCen.center = (650, 520)
-    screen.blit(guessed_word, guessed_wordCen)
-    pygame.display.update()
-    pygame.time.wait(1000)
-    # clock.tick(fps)
+    if(g_word != ("")):
+        res = '    '.join(g_word[i:i + 1]
+                          for i in range(0, len(g_word), 1))
+        guessed_word = mainFont1.render(
+            res, True, maroon, white)
+        guessed_wordCen = guessed_word.get_rect()
+        guessed_wordCen.center = (650, 520)
+        screen.blit(guessed_word, guessed_wordCen)
+        pygame.display.update()
+        pygame.time.wait(1000)
+# updates the screen and waiting time is 1000 miliseconds
 
 
 alertFont = pygame.font.SysFont('Comic Sans MS', 34)
 
 
 def input_check(guess):
+    # checks for correct input
     if len(guess) != 1 or not guess.isalpha():
         return False
     else:
         return True
 
 
-# tests whether the word has been correctly guessed or not
-
-
 def is_word_guessed(secret_word, letters_guessed):
+    # tests whether the word has been correctly guessed or not
     '''
     secret_word: word guess by the user
     letters_guessed: list hold all the word guess by the user
@@ -226,6 +235,7 @@ def get_available_letters(letters_guessed):
 
 
 def printChances(chances):
+    # prints chances left
     chance = subFont2.render("Chances: {}".format(
         chances), True, dark_green)
     subFont2.set_underline(0)
@@ -236,6 +246,7 @@ def printChances(chances):
 
 
 def printImage(chances):
+    # prints corresponding figure for every number of chances left
     if chances == 7:
         pygame.draw.rect(screen, black, [1000, 650, 250, 100])
     elif chances == 6:
@@ -288,6 +299,9 @@ def printImage(chances):
 
 
 global g_word
+g_word = ""
+# global declaration of pygame.Surface
+global Text3
 hint_used = True
 running = True
 while running:
@@ -324,11 +338,20 @@ while running:
     screen.blit(instruction2, (0, 340))
     screen.blit(instruction3, (0, 380))
     screen.blit(guessed_word, guessed_wordCen)
+
     button("Hint", 300, 420, 100, 50,
            darklightred, lightred)
     pygame.draw.rect(screen, yellow, [900, 420, 150, 50])
     printChances(chances)
+    available_letters = get_available_letters(letters_guessed)
+    Text3 = subFont.render(
+        "Available letters: {} ".format(available_letters), True, black, white)
+    screen.blit(Text3, (100, 640))
+    printFunction(g_word)
     printImage(chances)
+    pygame.display.update()
+    pygame.time.delay(1000)
+    # updates the screen and delay time is 1000 miliseconds
 
     for event in pygame.event.get():
 
@@ -337,11 +360,12 @@ while running:
             pygame.quit()
 
         if event.type == pygame.KEYDOWN:
+            # recognizes a keyboard event
             pressed_key = pygame.key.name(event.key)
-
+# recognizes which key has been pressed
             guess = str(pressed_key)
             letter = guess.lower()
-
+#  converts that to str and lower case
             if not input_check(pressed_key):
                 Text = alertFont.render(
                     "Wrong Input!!", True, red, yellow)
@@ -351,11 +375,7 @@ while running:
                 continue
             letters_guessed.append(letter)
             available_letters = get_available_letters(letters_guessed)
-            Text = subFont.render(
-                "Available letters: {} ".format(available_letters), True, black, white)
-            screen.blit(Text, (100, 640))
-            pygame.display.update()
-            pygame.time.delay(1000)
+
             if letter in secret_word:
 
                 g_word = get_guessed_word(secret_word, letters_guessed)
@@ -371,10 +391,9 @@ while running:
                         " * * Congratulations, you won! * *", True, orange_red, white)
                     screen.blit(Text, (350, 575))
                     pygame.display.update()
-                    pygame.time.delay(1000)
+                    pygame.time.delay(100)
                     pygame.quit()
             else:
-
                 Text = alertFont.render(
                     "Oops! That letter is not in my word!! ", True, red, yellow)
                 screen.blit(Text, (328, 575))
@@ -389,9 +408,11 @@ while running:
                 screen.blit(Text, (528, 620))
                 printFunction(secret_word)
                 pygame.display.update()
-                pygame.time.delay(100)
+                pygame.time.delay(1000)
                 pygame.quit()
+
         if ((event.type == pygame.MOUSEBUTTONDOWN) and (hint_used == True)):
+            # recognises the mouse events
             hint_used = False
             hint(secret_word, letters_guessed)
             if is_word_guessed(secret_word, letters_guessed) == True:
@@ -405,13 +426,14 @@ while running:
             # pygame.time.delay(1000)
             clock.tick(300)
         elif ((event.type == pygame.MOUSEBUTTONDOWN) and (hint_used != True)):
+            # recognises the mouse events
+            # if one hint has been provided already prints an alert
             Text = alertFont.render(
                 "No more hints available ", True, red, yellow)
             screen.blit(Text, (450, 575))
             pygame.display.update()
             pygame.time.delay(1000)
     pygame.display.flip()
+    # It allows only a portion of the screen to updated, instead of the entire area. If no argument is passed it updates the entire Surface area like pygame. display. flip() .
     clock.tick(30)
-printFunction(g_word)
-pygame.display.update()
-pygame.time.delay(1000)
+
